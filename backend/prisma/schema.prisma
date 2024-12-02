@@ -1,0 +1,332 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String             @id @default(uuid())
+  email            String             @unique
+  name             String?
+  password         String
+  role             Role               @default(USER)
+  isEmailVerified  Boolean            @default(false)
+  isLocked         Boolean            @default(false)
+  lockUntil        DateTime?
+  failedAttempts   Int                @default(0)
+  isActive         Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  Token            Token[]
+  Subjects         Subject[]
+  Session          Session[]
+  AuditLog         AuditLog[]
+  LoginHistory     LoginHistory[]
+  UserFeedback     UserFeedback[]
+  UserQuestionRank UserQuestionRank[]
+}
+
+model Token {
+  id          Int       @id @default(autoincrement())
+  token       String
+  type        TokenType
+  expires     DateTime
+  blacklisted Boolean
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum TokenType {
+  ACCESS
+  REFRESH
+  RESET_PASSWORD
+  VERIFY_EMAIL
+}
+
+model Subject {
+  id          String     @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  UserSubject User[]
+  Question    Question[]
+}
+
+model QuestionTag {
+  id          String     @id @default(uuid())
+  tag         String
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Questions   Question[]
+}
+
+model Question {
+  id                     String                   @id @default(uuid())
+  text                   String
+  description            String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  difficulty             Int                      @default(1) // Difficulty levels, e.g., 1 (easy), 2 (medium), 3 (hard)
+  isMultipleChoice       Boolean                  @default(false)
+  isPublic               Boolean                  @default(false)
+  Subject                Subject[]
+  TaggingQuestions       QuestionTag[]
+  Answer                 Answer[]
+  Reference              Reference[]
+  SessionQuestion        SessionQuestion[]
+  UserFeedback           UserFeedback[]
+  QuestionScoreSummary   QuestionScoreSummary[]
+  UserQuestionRank       UserQuestionRank[]
+  AnswerSelectionSummary AnswerSelectionSummary[]
+}
+
+model Answer {
+  id                     String                   @id @default(uuid())
+  text                   String
+  explaination           String
+  isCorrect              Boolean                  @default(false)
+  sequence               Int                      @default(1)
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  questionId             String
+  Question               Question                 @relation(fields: [questionId], references: [id])
+  SessionQuestion        SessionQuestion?         @relation(fields: [sessionQuestionId], references: [id])
+  sessionQuestionId      String?
+  UserQuestion           UserQuestion[]
+  AnswerSelectionSummary AnswerSelectionSummary[]
+}
+
+model Reference {
+  id          String     @id @default(uuid())
+  description String
+  format      String     @default("text")
+  sequence    Int        @default(1)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  Questions   Question[]
+}
+
+enum SessionStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+}
+
+model Session {
+  id                 String               @id @default(uuid())
+  userId             String
+  User               User                 @relation(fields: [userId], references: [id])
+  status             SessionStatus
+  createdAt          DateTime             @default(now())
+  expiresAt          DateTime
+  updatedAt          DateTime             @updatedAt
+  SessionQuestion    SessionQuestion[]
+  UserSessionSummary UserSessionSummary[]
+}
+
+model SessionQuestion {
+  id           String         @id @default(uuid())
+  sessionId    String
+  questionId   String
+  order        Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  session      Session        @relation(fields: [sessionId], references: [id])
+  question     Question       @relation(fields: [questionId], references: [id])
+  Answer       Answer[]
+  UserQuestion UserQuestion[]
+}
+
+model UserQuestion {
+  id                String          @id @default(uuid())
+  sessionQuestionId String
+  answerId          String
+  isCorrect         Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  sessionQuestion   SessionQuestion @relation(fields: [sessionQuestionId], references: [id])
+  answer            Answer          @relation(fields: [answerId], references: [id])
+}
+
+model UserSessionSummary {
+  id             String   @id @default(uuid())
+  sessionId      String   @unique
+  correctAnswer  Int      @default(0)
+  totalQuestions Int      @default(0)
+  score          Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Session        Session  @relation(fields: [sessionId], references: [id])
+}
+
+model QuestionScoreSummary {
+  id              String   @id @default(uuid())
+  questionId      String
+  totalAttempts   Int      @default(0)
+  correctAttempts Int      @default(0)
+  averageScore    Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  Question        Question @relation(fields: [questionId], references: [id])
+}
+
+model UserQuestionRank {
+  id         String   @id @default(uuid())
+  userId     String
+  questionId String
+  rank       Int      @default(0)
+  score      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  User       User     @relation(fields: [userId], references: [id])
+  Question   Question @relation(fields: [questionId], references: [id])
+}
+
+model AnswerSelectionSummary {
+  id             String   @id @default(uuid())
+  questionId     String
+  answerId       String
+  selectionCount Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Question       Question @relation(fields: [questionId], references: [id])
+  Answer         Answer   @relation(fields: [answerId], references: [id])
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  action    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  ipAddress String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model UserFeedback {
+  id         String   @id @default(uuid())
+  userId     String
+  feedback   String
+  rating     Int
+  questionId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  User       User     @relation(fields: [userId], references: [id])
+  Question   Question @relation(fields: [questionId], references: [id])
+}
+
+// Archived schema
+model PublicUser {
+  id                String              @id @default(uuid())
+  name              String?
+  email             String              @unique
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  PublicUserSession PublicUserSession[]
+}
+
+model Questions {
+  id                  String                @id @default(uuid())
+  title               String
+  description         String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  TaggingQuestions    TaggingQuestions?     @relation(fields: [taggingQuestionsId], references: [id])
+  taggingQuestionsId  String?
+  difficulty          Int                   @default(1)
+  isMultipleChoice    Boolean               @default(false)
+  isPublic            Boolean               @default(false)
+  QuestionsAnswers    QuestionsAnswers[]
+  UserQuestions       UserQuestions[]
+  QuestionsReferences QuestionsReferences[]
+}
+
+model QuestionsAnswers {
+  id                String              @id @default(uuid())
+  answer            String
+  isCorrect         Boolean             @default(false)
+  sequence          Int                 @default(1)
+  questionsId       String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  Questions         Questions           @relation(fields: [questionsId], references: [id])
+  PublicUserAnswers PublicUserAnswers[]
+}
+
+model QuestionsReferences {
+  id        String      @id @default(uuid())
+  reference String
+  format    String      @default("text")
+  sequence  Int         @default(1)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  Questions Questions[]
+}
+
+model TaggingQuestions {
+  id          String      @id @default(uuid())
+  tag         String      @unique
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  Questions   Questions[]
+}
+
+model UserQuestions {
+  id         String              @id @default(uuid())
+  sessionId  String
+  questionId String
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  session    PublicUserSession   @relation(fields: [sessionId], references: [id])
+  question   Questions           @relation(fields: [questionId], references: [id])
+  answers    PublicUserAnswers[]
+
+  @@unique([sessionId, questionId])
+}
+
+model PublicUserAnswers {
+  id             String           @id @default(uuid())
+  userQuestionId String
+  answer         String
+  isCorrect      Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  userQuestion   UserQuestions    @relation(fields: [userQuestionId], references: [id])
+  userAnswer     QuestionsAnswers @relation(fields: [answer], references: [id])
+}
+
+model PublicUserSession {
+  id          String          @id @default(uuid())
+  userId      String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  PublicUser  PublicUser      @relation(fields: [userId], references: [id])
+  SessionInfo UserQuestions[]
+}
