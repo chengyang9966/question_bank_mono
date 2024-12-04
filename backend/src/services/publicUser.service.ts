@@ -5,7 +5,6 @@ import {
   Questions,
   QuestionsAnswers,
   QuestionsReferences,
-  Role,
   UserQuestions
 } from '@prisma/client';
 import prisma from '../client';
@@ -123,6 +122,7 @@ const getPublicUserById = async <Key extends keyof PublicUserWithSession>(
     UserSession: PublicUserSession.map(({ SessionInfo, ...rest }) => {
       return {
         ...rest,
+        // eslint-disable-next-line
         SessionInfo: SessionInfo.map(({ question, answers, ...rest }) => {
           return {
             ...rest,
@@ -232,6 +232,7 @@ const queryPublicUsers = async <Key extends keyof PublicUserWithSession>(
         UserSession: PublicUserSession.map(({ SessionInfo, ...rest }) => {
           return {
             ...rest,
+            // eslint-disable-next-line
             SessionInfo: SessionInfo.map(({ question, answers, ...rest }) => {
               return {
                 ...rest,

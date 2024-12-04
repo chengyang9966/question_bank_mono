@@ -6,7 +6,9 @@ import LoginPage from './pages/Login';
 import { UserProvider } from './context/userContext';
 import DefaultLayout from './layout/DefaultLayout';
 import Dashboard from './pages/Dashboard';
-import SEO from './component/SEO';
+import SEO from './components/SEO';
+import RegisterPage from './pages/Register';
+import VerifyEmailPage from './pages/VerifyEmail';
 
 const queryClient = new QueryClient();
 function App() {
@@ -28,6 +30,8 @@ function App() {
           </Route>
           <Route element={<DefaultLayout />}>
             <Route path="login" element={<LoginPage />} />
+            <Route path="register" element={<RegisterPage />} />
+            <Route path="verify-email" element={<VerifyEmailPage />} />
           </Route>
           {/* <Route path="about" element={<About />} />
 

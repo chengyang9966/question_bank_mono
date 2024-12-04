@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const refreshTokenUrl = 'http://localhost:3077/api/v1/auth/refresh-tokens';
-const baseUrl = 'http://localhost:3077';
+const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
 
 const baseAxios = axios.create({
   baseURL: baseUrl,
@@ -25,7 +25,13 @@ baseAxios.interceptors.request.use(
 baseAxios.interceptors.response.use(
   (response) => response, // Directly return successful responses.
   async (error) => {
+    const excludeUrls = ['/api/v1/auth/login', '/api/v1/auth/verify-email'];
     const originalRequest = error.config;
+    console.log('originalRequest', originalRequest.url);
+    if (excludeUrls.includes(originalRequest.url.split('?')[0])) {
+      // If the request is to the refresh token URL, return the error as is.
+      return Promise.reject(error);
+    }
     if (error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Mark the request as retried to avoid infinite loops.
       try {

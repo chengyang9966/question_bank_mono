@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-let answer = Joi.object().keys({
+const answer = Joi.object().keys({
   id: Joi.string().trim().optional(),
   answer: Joi.string().trim().required(),
   sequence: Joi.number().optional(),
@@ -70,7 +70,7 @@ const getQuestionsById = {
   })
 };
 
-let references = Joi.object().keys({
+const references = Joi.object().keys({
   id: Joi.string().optional(),
   reference: Joi.string().trim().required(),
   sequence: Joi.number().required(),

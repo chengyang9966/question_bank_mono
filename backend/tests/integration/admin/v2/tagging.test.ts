@@ -16,12 +16,13 @@ setupTestDB();
 describe('Admin Tagging V2 routes', () => {
   // Get All Tagging
   describe('GET /api/v2/admin/tagging', () => {
+    // eslint-disable-next-line
     let newTaggingArray: Array<{
       tag: string;
       description: string;
       createdAt: string;
       updatedAt: string;
-    }>;
+    }> = [];
     beforeEach(() => {
       newTaggingArray = [
         {
@@ -35,7 +36,7 @@ describe('Admin Tagging V2 routes', () => {
 
     test('should return 401 if no token provided', async () => {
       //  await insertTagging(newTaggingArray);
-      const res = await request(app).get('/api/v2/admin/tagging').expect(httpStatus.UNAUTHORIZED);
+      await request(app).get('/api/v2/admin/tagging').expect(httpStatus.UNAUTHORIZED);
     });
 
     test('should return 401 if request is User', async () => {
@@ -48,7 +49,7 @@ describe('Admin Tagging V2 routes', () => {
         TokenType.ACCESS
       );
 
-      const res = await request(app)
+      await request(app)
         .get('/api/v2/admin/tagging')
         .set({
           Authorization: userOneAccessToken

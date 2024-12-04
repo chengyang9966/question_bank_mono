@@ -45,7 +45,7 @@ const ProtectedLayout = () => {
         </div>
       </Content>
       <Footer style={{ textAlign: 'center' }}>
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
+        Tech DevX Solutions ©{new Date().getFullYear()} Created by Tech DevX
       </Footer>
     </Layout>
   );

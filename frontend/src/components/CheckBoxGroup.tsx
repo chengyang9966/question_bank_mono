@@ -1,5 +1,5 @@
 import { Checkbox, Col, FormInstance, Row, Typography } from 'antd';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const CheckBoxGroup = ({
   mcqOptions,
@@ -7,6 +7,7 @@ const CheckBoxGroup = ({
   field,
 }: {
   mcqOptions: { label: string; value: string; sideText?: string }[];
+  // eslint-disable-next-line
   form: FormInstance<any>;
   field: string;
 }) => {
@@ -57,7 +58,7 @@ const CheckBoxGroup = ({
       style={{ display: 'block', width: '100%' }}
     >
       {mcqOptions.map((option, index) => (
-        <Row justify={'space-between'} align={'middle'}>
+        <Row justify={'space-between'} align={'middle'} key={index}>
           <Col>
             <Checkbox
               key={option.value}

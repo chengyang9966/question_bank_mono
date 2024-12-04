@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import config from '../config/config';
 import logger from '../config/logger';
-
+import fs from 'fs';
 const transport = nodemailer.createTransport(config.email.smtp);
 /* istanbul ignore next */
 if (config.env !== 'test') {
@@ -28,6 +28,18 @@ const sendEmail = async (to: string, subject: string, text: string) => {
 };
 
 /**
+ * Send an email with HTML content
+ * @param {string} to
+ * @param {string} subject
+ * @param {string} text
+ * @returns {Promise}
+ */
+const sendEmailWithHTML = async (to: string, subject: string, html: string) => {
+  const msg = { from: config.email.from, to, subject, html };
+  await transport.sendMail(msg);
+};
+
+/**
  * Send reset password email
  * @param {string} to
  * @param {string} token
@@ -36,7 +48,7 @@ const sendEmail = async (to: string, subject: string, text: string) => {
 const sendResetPasswordEmail = async (to: string, token: string) => {
   const subject = 'Reset password';
   // replace this url with the link to the reset password page of your front-end app
-  const resetPasswordUrl = `http://link-to-app/reset-password?token=${token}`;
+  const resetPasswordUrl = `${config.verificationEmailUrl}/reset-password?token=${token}`;
   const text = `Dear user,
 To reset your password, click on this link: ${resetPasswordUrl}
 If you did not request any password resets, then ignore this email.`;
@@ -52,10 +64,14 @@ If you did not request any password resets, then ignore this email.`;
 const sendVerificationEmail = async (to: string, token: string) => {
   const subject = 'Email Verification';
   // replace this url with the link to the email verification page of your front-end app
-  const verificationEmailUrl = `http://link-to-app/verify-email?token=${token}`;
-  const text = `Dear user,
-To verify your email, click on this link: ${verificationEmailUrl}`;
-  await sendEmail(to, subject, text);
+  const verificationEmailUrl = `${config.verificationEmailUrl}/verify-email?token=${token}&email=${to}`;
+
+  const path = 'src/template/verifyEmail.html';
+  const html = fs
+    .readFileSync(path, 'utf8')
+    .replace('{{verificationEmailUrl}}', verificationEmailUrl)
+    .replace('{{LOGO}}', config.LOGO);
+  await sendEmailWithHTML(to, subject, html);
 };
 
 export default {

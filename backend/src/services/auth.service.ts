@@ -7,6 +7,7 @@ import prisma from '../client';
 import { encryptPassword, isPasswordMatch } from '../utils/encryption';
 import { AuthTokensResponse } from '../types/response';
 import exclude from '../utils/exclude';
+import emailService from './email.service';
 
 /**
  * Login with username and password
@@ -32,6 +33,11 @@ const loginUserWithEmailAndPassword = async (
   ]);
   if (!user || !(await isPasswordMatch(password, user.password as string))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+  }
+  if (!user.isEmailVerified) {
+    const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+    await emailService.sendVerificationEmail(user.email, verifyEmailToken);
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'email_not_verified');
   }
   return exclude(user, ['password']);
 };

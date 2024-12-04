@@ -1,9 +1,7 @@
 import app from '../../../src/app';
-import config from '../../../src/config/config';
 import setupTestDB from '../../utils/setupTestDb';
-import { describe, beforeEach, test, expect, jest } from '@jest/globals';
+import { describe, beforeEach, test, expect } from '@jest/globals';
 import request from 'supertest';
-import prisma from '../../../src/client';
 import { faker } from '@faker-js/faker';
 import httpStatus from 'http-status';
 import { insertTagging } from '../../fixtures/tagging.fixture';

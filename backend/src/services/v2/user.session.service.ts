@@ -1,12 +1,7 @@
-import { PublicUser, Session, Role, SessionStatus, Question, Answer } from '@prisma/client';
+import { Session, SessionStatus, Question, Answer } from '@prisma/client';
 import prisma from '../../client';
 import ApiError from '../../utils/ApiError';
 import httpStatus from 'http-status';
-import paginationHelper from '../../helper/pagination.helper';
-
-type SessionWithQuestions = Partial<Session> & {
-  SessionQuestion: Partial<Question>[];
-};
 
 type SessionWithQuestionsAndUser = Partial<Session> & {
   SessionQuestion: Partial<{
@@ -322,7 +317,7 @@ async function answerSessionQuestion({
     const isValidAnswer = sessionQuestion.question.Answer.some((answer) =>
       answerIds.includes(answer.id)
     );
-    let questionAnswer = sessionQuestion.question.Answer;
+    const questionAnswer = sessionQuestion.question.Answer;
     const userAnswers = questionAnswer
       .map((w) => (answerIds.includes(w.id) ? w : null))
       .filter((x) => x);
@@ -372,7 +367,7 @@ async function answerSessionQuestion({
       }
 
       // Step 5: Optionally Update Answer Selection Summary
-      let answerSelectionSummary = await tx.answerSelectionSummary.findFirst({
+      const answerSelectionSummary = await tx.answerSelectionSummary.findFirst({
         where: {
           questionId: sessionQuestion.questionId,
           answerId: answerId
@@ -412,7 +407,7 @@ async function answerSessionQuestion({
     });
 
     // Step 6: Update Question Score Summary
-    let questionScoreSummary = await tx.questionScoreSummary.findFirst({
+    const questionScoreSummary = await tx.questionScoreSummary.findFirst({
       where: {
         questionId: sessionQuestion.questionId
       }
@@ -439,7 +434,7 @@ async function answerSessionQuestion({
         }
       });
     }
-    let questionSummary = await tx.questionScoreSummary.findFirst({
+    const questionSummary = await tx.questionScoreSummary.findFirst({
       where: {
         questionId: sessionQuestion.questionId
       }
@@ -448,12 +443,12 @@ async function answerSessionQuestion({
       totalAttempts: questionSummary?.totalAttempts || 1,
       isCorrect: questionSummary?.correctAttempts || 0
     };
-    let answerSummary = await tx.answerSelectionSummary.findMany({
+    const answerSummary = await tx.answerSelectionSummary.findMany({
       where: {
         questionId: sessionQuestion.questionId
       }
     });
-    let answerStatistic = sessionQuestion.question.Answer.reduce((prev, current) => {
+    const answerStatistic = sessionQuestion.question.Answer.reduce((prev, current) => {
       const answerStatistic = answerSummary.find((ans) => ans.answerId === current.id);
       return {
         ...prev,

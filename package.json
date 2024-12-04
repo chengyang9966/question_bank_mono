@@ -10,7 +10,7 @@
     "husky": "^9.1.7"
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "start:dev": "concurrently \"yarn start:frontend:dev\" \"yarn start:backend:dev\"",
     "start:frontend:dev": "cd frontend && yarn dev",
     "start:backend:dev": "cd backend && yarn dev"

@@ -2,14 +2,13 @@ import { Button, Card, Col, Form, FormProps, Input, Row } from 'antd';
 import { useUser } from '../context/userContext';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import baseAxios from '../axios/baseAxios';
-import { Subject } from '../types/Login';
 import { TaggingQuestionData } from '../types/Tagging';
-import CheckBoxGroup from '../component/CheckBoxGroup';
+import CheckBoxGroup from '../components/CheckBoxGroup';
 import { useNavigate } from 'react-router';
-import SEO from '../component/SEO';
+import SEO from '../components/SEO';
 import { UserSessionResponse } from '../types/UserSession';
 import { Tree } from 'antd';
-import type { TreeDataNode, TreeProps } from 'antd';
+import type { TreeDataNode } from 'antd';
 
 type SessionFieldType = {
   numberOfQuestions?: number;
@@ -55,7 +54,7 @@ const Dashboard = () => {
       });
       return response.data;
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (data) => {
       console.log(data);
       navigate(`/session/${data.id}`);
     },

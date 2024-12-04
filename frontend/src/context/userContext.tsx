@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { Tokens, User } from '../types/Login';
 
 interface UserContextType {
@@ -37,6 +37,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line
 export const useUser = (): UserContextType => {
   const context = useContext(UserContext);
   if (context === undefined) {

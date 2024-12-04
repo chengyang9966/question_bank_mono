@@ -4,6 +4,9 @@ import prisma from '../client';
 import ApiError from '../utils/ApiError';
 import { encryptPassword } from '../utils/encryption';
 import { buildSelect } from '../utils/select';
+import tokenService from './token.service';
+import emailService from './email.service';
+const medicalSubjectId = 'd5341128-27b0-467c-8a7a-8031bd005f16';
 
 type UserWithSubject = User & {
   Subjects: Subject[];
@@ -23,14 +26,25 @@ const createUser = async (
   if (await getUserByEmail(email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name,
       password: await encryptPassword(password),
-      role
+      role,
+      Subjects: {
+        connect: {
+          id: medicalSubjectId
+        }
+      }
     }
   });
+  if (!user) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'User not created');
+  }
+  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+  await emailService.sendVerificationEmail(user.email, verifyEmailToken);
+  return user;
 };
 
 /**

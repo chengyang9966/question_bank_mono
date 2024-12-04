@@ -1,4 +1,4 @@
-import { PublicUser, PublicUserSession, Questions, Role } from '@prisma/client';
+import { PublicUser, PublicUserSession, Questions } from '@prisma/client';
 import prisma from '../client';
 import ApiError from '../utils/ApiError';
 import httpStatus from 'http-status';
@@ -82,9 +82,9 @@ const createPublicUserSessionByUserId = async (
 const generateQuestionsForPublicUserSession = async (
   sessionId: string,
   questionsTagging: string,
-  numberOfQuestions: number = 3,
-  mcq: boolean = true,
-  difficulty: number = 1
+  numberOfQuestions = 3,
+  mcq = true,
+  difficulty = 1
 ): Promise<PublicUserSessionWithQuestions> => {
   return await prisma.$transaction(async (tx) => {
     const session = await tx.publicUserSession.findUnique({

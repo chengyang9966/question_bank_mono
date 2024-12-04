@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import baseAxios from '../axios/baseAxios';
 import { UserSessionResponse } from '../types/UserSession';
-import QuestionCard from '../component/questionCard';
+import QuestionCard from '../components/questionCard';
 import { useEffect, useState } from 'react';
 import { Button, Col, Modal, Pagination, Progress, Result, Row, Typography } from 'antd';
 import { useNavigate, useParams } from 'react-router';
@@ -43,8 +43,8 @@ const QuestionsPage = () => {
     },
     onSuccess: (data, variables) => {
       console.log(data);
-      let answerStats = Object.keys(data.answerStatistic).reduce((acc, x) => {
-        let count = data.answerStatistic[x];
+      const answerStats = Object.keys(data.answerStatistic).reduce((acc, x) => {
+        const count = data.answerStatistic[x];
         return {
           ...acc,
           [x]: (count / data.questionStatistic.totalAttempts) * 100,
@@ -77,6 +77,7 @@ const QuestionsPage = () => {
         setShowCompleteModel(true);
       }, 3000);
     }
+    // eslint-disable-next-line
   }, [JSON.stringify(completedQuestionsIds)]);
 
   const submitAnswer = () => {
@@ -204,7 +205,7 @@ const QuestionsPage = () => {
           extra={
             <>
               {data?.[0]?.SessionQuestion.map((question, index) => {
-                let answerData = correctAnswer[question.question.id];
+                const answerData = correctAnswer[question.question.id];
                 console.log('🚀 ~ {data?.[0]?.SessionQuestion.map ~ answerData:', {
                   answerData,
                   completedQuestionsIds,

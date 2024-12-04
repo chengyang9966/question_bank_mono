@@ -2,7 +2,6 @@ import express from 'express';
 import validate from '../../../middlewares/validate';
 import { questionsValidation } from '../../../validations';
 import { adminController } from '../../../controllers';
-import { upload } from '../../../config/multer';
 import uploadImageMiddleware from '../../../middlewares/uploadImageMiddleware';
 
 const router = express.Router();

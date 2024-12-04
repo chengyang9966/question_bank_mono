@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import catchAsync from '../utils/catchAsync';
 import { authService, userService, tokenService, emailService } from '../services';
 import exclude from '../utils/exclude';
-import { User } from '@prisma/client';
+import ApiError from '../utils/ApiError';
 
 const register = catchAsync(async (req, res) => {
   const { email, password, name } = req.body;
@@ -41,15 +41,19 @@ const resetPassword = catchAsync(async (req, res) => {
 });
 
 const sendVerificationEmail = catchAsync(async (req, res) => {
-  const user = req.user as User;
+  const { email } = req.body;
+  const user = await userService.getUserByEmail(email);
+  if (!user) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+  }
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
   await emailService.sendVerificationEmail(user.email, verifyEmailToken);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send();
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
   await authService.verifyEmail(req.query.token as string);
-  res.status(httpStatus.NO_CONTENT).send();
+  res.status(httpStatus.OK).send();
 });
 
 export default {

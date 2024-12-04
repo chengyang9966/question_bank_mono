@@ -31,7 +31,7 @@ const getAllQuestionsTaggingBySubjectId = async (
 
   const questionTag = await prisma.questionTag.findMany({
     orderBy: {
-      createdAt: 'desc'
+      sequence: 'asc'
     },
     where: {
       Questions: {
