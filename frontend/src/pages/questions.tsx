@@ -3,12 +3,13 @@ import baseAxios from '../axios/baseAxios';
 import { UserSessionResponse } from '../types/UserSession';
 import QuestionCard from '../components/questionCard';
 import { useEffect, useState } from 'react';
-import { Button, Col, Modal, Pagination, Progress, Result, Row, Typography } from 'antd';
+import { Button, Col, Modal, Pagination, Progress, Result, Row, Skeleton, Typography } from 'antd';
 import { useNavigate, useParams } from 'react-router';
 import { useUser } from '../context/userContext';
 import { successToast, warningToast } from '../utils/toast';
 import { QuestionSessionAnswerResponse } from '../types/QuestionSession';
 import { SmileOutlined } from '@ant-design/icons';
+import Feedback from '../components/Feedback';
 
 const QuestionsPage = () => {
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -88,7 +89,39 @@ const QuestionsPage = () => {
     mutate({ questionId, sessionId, answerIds });
   };
   const totalQuestions = data?.[0].SessionQuestion.length || 0;
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading)
+    return (
+      <Row>
+        <Col
+          xs={{
+            span: 24,
+            order: 2,
+          }}
+          md={{
+            span: 24,
+            order: 2,
+          }}
+          lg={{
+            span: 16,
+            order: 1,
+          }}
+        >
+          <Skeleton active paragraph={{ rows: 5 }} />
+        </Col>
+        <Col
+          xs={{
+            span: 24,
+          }}
+          md={{
+            span: 8,
+            order: 1,
+          }}
+          style={{ textAlign: 'center' }}
+        >
+          <Skeleton.Avatar active style={{ width: '100px', height: '100px' }} />
+        </Col>
+      </Row>
+    );
   return (
     <div>
       <Row justify={'center'} align="middle">
@@ -198,6 +231,15 @@ const QuestionsPage = () => {
           });
         })}
       </div>
+      <div className="my-4">
+        {data?.[0]?.SessionQuestion.filter(
+          (data, index) =>
+            index === selectedIndex &&
+            (completedQuestionsIds.includes(data.question.id) || data.userAnswer.length > 0),
+        ).map((question) => {
+          return <Feedback questionId={question.question.id} />;
+        })}
+      </div>
       <Modal visible={showCompleteModel} title="Congratulations" footer={null} onCancel={() => {}}>
         <Result
           title="All Questions has been Answered"
@@ -206,11 +248,6 @@ const QuestionsPage = () => {
             <>
               {data?.[0]?.SessionQuestion.map((question, index) => {
                 const answerData = correctAnswer[question.question.id];
-                console.log('🚀 ~ {data?.[0]?.SessionQuestion.map ~ answerData:', {
-                  answerData,
-                  completedQuestionsIds,
-                });
-
                 return (
                   <Row style={{ textAlign: 'start' }}>
                     <Col span={24}>

@@ -1,6 +1,6 @@
-export const buildSelect = (keys: string[]): Record<string, any> => {
+export const buildSelect = <T>(keys: Array<keyof T>): Record<string, any> => {
   const returnSelect = keys.reduce((obj: Record<string, any>, key) => {
-    const parts = key.split('.');
+    const parts = (key as string).split('.');
 
     let current = obj;
     for (let index = 0; index < parts.length; index++) {
@@ -18,7 +18,7 @@ export const buildSelect = (keys: string[]): Record<string, any> => {
       }
     }
     return obj;
-  }, {});
+  }, {} as Record<string, any>);
 
   return returnSelect;
 };

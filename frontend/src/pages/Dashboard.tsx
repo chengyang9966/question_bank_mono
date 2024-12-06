@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, FormProps, Input, Row } from 'antd';
+import { Button, Card, Col, Form, FormProps, Input, Row, Skeleton } from 'antd';
 import { useUser } from '../context/userContext';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import baseAxios from '../axios/baseAxios';
@@ -135,7 +135,7 @@ const Dashboard = () => {
     console.log('Failed:', errorInfo);
   };
 
-  if (isLoading || isLoadingUserSession) return <div>Loading...</div>;
+  if (isLoading || isLoadingUserSession) return <Skeleton active paragraph={{ rows: 5 }} />;
   return (
     <>
       <SEO

@@ -6,3 +6,4 @@ export { default as publicUserSessionValidation } from './publicUserSession.vali
 export { default as userSessionValidation } from './userSession.validate';
 export { default as taggingValidation } from './tagging.validation';
 export { default as questionSessionValidation } from './question.validation';
+export { default as userFeedbackValidation } from './userFeedback.validation';

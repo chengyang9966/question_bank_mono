@@ -1,4 +1,4 @@
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu, Skeleton, theme } from 'antd';
 import { Navigate, Outlet } from 'react-router';
 import { useUser } from '../context/userContext';
 
@@ -13,25 +13,52 @@ const ProtectedLayout = () => {
   });
 
   const { Content, Footer, Header } = Layout;
-  const items = new Array(3).fill(null).map((_, index) => ({
-    key: index + 1,
-    label: `nav ${index + 1}`,
-  }));
+  // const items = new Array(3).fill(null).map((_, index) => ({
+  //   key: index + 1,
+  //   label: `nav ${index + 1}`,
+  // }));
+
+  const userMenu = [
+    {
+      label: user?.name,
+      key: '1',
+      onClick: () => {
+        console.log('User Profile');
+      },
+      children: [
+        {
+          label: 'Settings',
+          key: '1.1',
+          onClick: () => {
+            console.log('Settings');
+          },
+        },
+        {
+          label: 'Logout',
+          key: '1.2',
+          onClick: () => {
+            console.log('Logout');
+          },
+        },
+      ],
+    },
+  ];
+
   if (loading) {
-    return <div>Loading...</div>; // Display a loader while the context is loading
+    return <Skeleton active paragraph={{ rows: 5 }} />; // Display a loader while the context is loading
   }
   if (!user || !token) return <Navigate to="/login" />;
   return (
     <Layout>
-      <Header style={{ display: 'flex', alignItems: 'center' }}>
-        <div className="demo-logo" />
+      <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Menu
           theme="dark"
           mode="horizontal"
           defaultSelectedKeys={['2']}
-          items={items}
+          items={[]}
           style={{ flex: 1, minWidth: 0 }}
         />
+        <Menu theme="dark" mode="horizontal" items={userMenu} />
       </Header>
       <Content style={{ padding: '0 48px', paddingTop: '48px' }}>
         <div

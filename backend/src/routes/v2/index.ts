@@ -6,6 +6,8 @@ import referencesRoute from './admin/reference.route';
 import userSessionRoute from './user.session.route';
 import userTaggingRoute from './tagging.route';
 import userQuestionRoute from './user.question.route';
+import userFeedbackRoute from './user.feedback.route';
+import adminUserFeedbackRoute from './admin/user.feedback.route';
 
 const router = express.Router();
 
@@ -13,6 +15,10 @@ const defaultRoutes = [
   {
     path: '/admin/tagging',
     route: adminTaggingRoute
+  },
+  {
+    path: '/admin/user/feedback',
+    route: adminUserFeedbackRoute
   },
   {
     path: '/admin/auth',
@@ -37,6 +43,10 @@ const defaultRoutes = [
   {
     path: '/user/question',
     route: userQuestionRoute
+  },
+  {
+    path: '/user/feedback',
+    route: userFeedbackRoute
   }
 ];
 
