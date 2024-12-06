@@ -69,11 +69,16 @@ const LoginPage: React.FC = () => {
     if (localStorage.getItem('remember')) {
       const email = localStorage.getItem('email') || '';
       const password = atob(localStorage.getItem('password') || '');
-      mutate({
+      form.setFieldsValue({
         email,
         password,
         remember: 'true',
       });
+      // mutate({
+      //   email,
+      //   password,
+      //   remember: 'true',
+      // });
     }
     // eslint-disable-next-line
   }, []);

@@ -1,23 +1,54 @@
-import { Layout, Menu, Skeleton, theme } from 'antd';
-import { Navigate, Outlet } from 'react-router';
+import { Layout, Menu, Modal, Skeleton, theme, Typography } from 'antd';
+import { Navigate, Outlet, useNavigate } from 'react-router';
 import { useUser } from '../context/userContext';
+import { useMutation } from '@tanstack/react-query';
+import baseAxios from '../axios/baseAxios';
+import { toast } from 'react-toastify';
+import { useState } from 'react';
 
 const ProtectedLayout = () => {
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
   const { token, user, loading } = useUser();
-  console.log('🚀 ~ ProtectedLayout ~ token:', {
-    token,
-    user,
-  });
+  const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { Content, Footer, Header } = Layout;
   // const items = new Array(3).fill(null).map((_, index) => ({
   //   key: index + 1,
   //   label: `nav ${index + 1}`,
   // }));
+  const { mutate } = useMutation({
+    mutationKey: ['logout'],
+    mutationFn: async () => {
+      baseAxios.post('/api/v1/auth/logout', {
+        refreshToken: token?.refresh.token,
+      });
+    },
+    onSuccess: () => {
+      toast.success('Logout successful');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('tokens');
 
+      navigate('/login');
+    },
+  });
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+    mutate();
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
   const userMenu = [
     {
       label: user?.name,
@@ -27,18 +58,23 @@ const ProtectedLayout = () => {
       },
       children: [
         {
-          label: 'Settings',
+          label: 'Profile',
           key: '1.1',
           onClick: () => {
             console.log('Settings');
           },
         },
         {
-          label: 'Logout',
+          label: 'Quiz History',
           key: '1.2',
           onClick: () => {
-            console.log('Logout');
+            navigate('/user-quiz');
           },
+        },
+        {
+          label: 'Logout',
+          key: '1.3',
+          onClick: showModal,
         },
       ],
     },
@@ -51,6 +87,18 @@ const ProtectedLayout = () => {
   return (
     <Layout>
       <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div
+          className="logo"
+          style={{
+            borderRadius: borderRadiusLG,
+            background: colorBgContainer,
+            height: 32,
+            width: 32,
+          }}
+          onClick={() => {
+            navigate('/');
+          }}
+        />
         <Menu
           theme="dark"
           mode="horizontal"
@@ -74,6 +122,9 @@ const ProtectedLayout = () => {
       <Footer style={{ textAlign: 'center' }}>
         Tech DevX Solutions ©{new Date().getFullYear()} Created by Tech DevX
       </Footer>
+      <Modal title="Logout" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+        <Typography.Text type="secondary">Do you want to Logout?</Typography.Text>
+      </Modal>
     </Layout>
   );
 };

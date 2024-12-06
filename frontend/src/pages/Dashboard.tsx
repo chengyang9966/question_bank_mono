@@ -6,9 +6,6 @@ import { TaggingQuestionData } from '../types/Tagging';
 import CheckBoxGroup from '../components/CheckBoxGroup';
 import { useNavigate } from 'react-router';
 import SEO from '../components/SEO';
-import { UserSessionResponse } from '../types/UserSession';
-import { Tree } from 'antd';
-import type { TreeDataNode } from 'antd';
 
 type SessionFieldType = {
   numberOfQuestions?: number;
@@ -28,16 +25,6 @@ const Dashboard = () => {
       const response = await baseAxios.get<{
         data: TaggingQuestionData[];
       }>(`/api/v2/user/tagging/${defaultSubject?.id}`);
-      return response.data.data;
-    },
-    enabled: !!defaultSubject?.id,
-  });
-  const { data: dataUserSession, isLoading: isLoadingUserSession } = useQuery({
-    queryKey: ['userSession', defaultSubject?.id],
-    queryFn: async () => {
-      const response = await baseAxios.get<{
-        data: UserSessionResponse[];
-      }>(`/api/v2/user/session/${user?.id}`);
       return response.data.data;
     },
     enabled: !!defaultSubject?.id,
@@ -95,37 +82,6 @@ const Dashboard = () => {
    *
    */
 
-  const treeData: TreeDataNode[] =
-    dataUserSession
-      ?.filter((x) => x.SessionQuestion.length > 0)
-      ?.map((userSession) => {
-        return {
-          title: `Session ${
-            userSession.UserSessionSummary.length > 0
-              ? ` ${userSession.UserSessionSummary[0]?.correctAnswer} of ${userSession.UserSessionSummary[0]?.totalQuestions}`
-              : ''
-          }`,
-          key: userSession.id,
-          children: userSession.SessionQuestion.map((session) => {
-            return {
-              title: session.question.text,
-              key: `${session.question.id}_${userSession.id}`,
-              children: session.question.Answer.map((answer) => {
-                const userAnswer = session.userAnswer.find((ans) => ans.id === answer.id);
-                return {
-                  title: answer.text,
-                  key: `${session.question.id}_${userSession.id}_${answer.id}`,
-                  selected: false,
-                  style: {
-                    color: userAnswer ? (answer.isCorrect ? 'green' : 'red') : 'grey',
-                    fontWeight: userAnswer ? 'bold' : 'normal',
-                  },
-                };
-              }),
-            };
-          }),
-        };
-      }) || [];
   const onFinish: FormProps<SessionFieldType>['onFinish'] = (values) => {
     console.log('Success:', values);
     mutate(values);
@@ -135,7 +91,7 @@ const Dashboard = () => {
     console.log('Failed:', errorInfo);
   };
 
-  if (isLoading || isLoadingUserSession) return <Skeleton active paragraph={{ rows: 5 }} />;
+  if (isLoading) return <Skeleton active paragraph={{ rows: 5 }} />;
   return (
     <>
       <SEO
@@ -159,20 +115,21 @@ const Dashboard = () => {
       >
         <Row gutter={[24, 10]}>
           <Col
-            sm={{
-              span: 24,
-              order: 1,
-            }}
-            xs={{
-              span: 24,
-              order: 1,
-            }}
-            md={{
-              span: 16,
-              order: 1,
-            }}
+            // sm={{
+            //   span: 24,
+            //   order: 1,
+            // }}
+            // xs={{
+            //   span: 24,
+            //   order: 1,
+            // }}
+            // md={{
+            //   span: 16,
+            //   order: 1,
+            // }}
+            span={24}
           >
-            <Card title="Create Session">
+            <Card title="Create Quiz">
               <Form.Item<SessionFieldType> name="questionsTaggingId" label="Chapters">
                 <CheckBoxGroup
                   mcqOptions={[
@@ -213,7 +170,7 @@ const Dashboard = () => {
               </Button>
             </Card>
           </Col>
-          <Col
+          {/* <Col
             md={{
               span: 8,
               order: 2,
@@ -239,7 +196,7 @@ const Dashboard = () => {
                 treeData={treeData}
               />
             </Card>
-          </Col>
+          </Col> */}
         </Row>
       </Form>
     </>
