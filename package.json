@@ -13,7 +13,8 @@
     "prepare": "husky",
     "start:dev": "concurrently \"yarn start:frontend:dev\" \"yarn start:backend:dev\"",
     "start:frontend:dev": "cd frontend && yarn dev",
-    "start:backend:dev": "cd backend && yarn dev"
+    "start:backend:dev": "cd backend && yarn dev",
+    "test:backend": "cd backend && yarn test"
   },
   "lint-staged": {
     "*.{js,css,ts,tsx,jsx}": [
