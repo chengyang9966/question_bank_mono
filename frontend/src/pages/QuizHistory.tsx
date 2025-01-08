@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
 import baseAxios from '../axios/baseAxios';
 import { UserSessionResponse } from '../types/UserSession';
 import { useUser } from '../context/userContext';

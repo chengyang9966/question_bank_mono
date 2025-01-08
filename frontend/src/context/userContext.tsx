@@ -7,6 +7,7 @@ interface UserContextType {
   setToken: (user: Tokens | null) => void;
   setUser: (user: User | null) => void;
   loading: boolean;
+  logout: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -30,8 +31,16 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
 
     loadData();
   }, []);
+  const logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('tokens');
+    setUser(null);
+    setToken(null);
+  };
   return (
-    <UserContext.Provider value={{ user, token, setUser, setToken, loading }}>
+    <UserContext.Provider value={{ user, token, setUser, setToken, loading, logout }}>
       {children}
     </UserContext.Provider>
   );

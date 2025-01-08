@@ -212,6 +212,8 @@ model AuditLog {
   id        Int      @id @default(autoincrement())
   userId    String
   action    String
+  old_data  Json
+  new_data  Json
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   User      User     @relation(fields: [userId], references: [id])

@@ -7,6 +7,8 @@ import { LoginTypeResponse } from '../types/Login';
 import { useUser } from '../context/userContext';
 import { Title } from '../components/Title';
 import VerificationEmail from '../components/result/verificationEmail';
+import axios from 'axios';
+import { errorToast } from '../utils/toast';
 
 type FieldType = {
   email?: string;
@@ -43,6 +45,12 @@ const RegisterPage: React.FC = () => {
       // window.location.href = '/';
       setIsComplete(true);
     },
+    onError: (error) => {
+      console.log('error', error);
+      if (axios.isAxiosError(error)) {
+        errorToast(error.response?.data?.message);
+      }
+    },
   });
 
   const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
@@ -57,121 +65,129 @@ const RegisterPage: React.FC = () => {
   return (
     <div
       style={{
-        backgroundColor: colorBgContainer,
-        borderRadius: borderRadiusLG,
-        padding: '20px',
-        width: '400px',
         margin: 'auto',
-        marginTop: '100px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
       }}
     >
-      {isComplete ? (
-        <VerificationEmail
-          status="success"
-          title="Your account has been created successfully!"
-          extra={
-            <Button type="primary" href="/login">
-              Back Home
-            </Button>
-          }
-        />
-      ) : (
-        <div>
-          <Title title="Sign Up" subTitle="Welcome! Please enter your details" />
-          <Form
-            name="basic"
-            labelCol={{ span: 24 }}
-            wrapperCol={{ span: 24 }}
-            initialValues={{ remember: true }}
-            onFinish={onFinish}
-            onFinishFailed={onFinishFailed}
-          >
-            <Form.Item<FieldType>
-              label="Name"
-              name="name"
-              className="mb-3"
-              rules={[{ required: true, message: 'Please input your name!' }]}
+      <div
+        style={{
+          backgroundColor: colorBgContainer,
+          borderRadius: borderRadiusLG,
+          padding: '20px',
+          maxWidth: '400px',
+        }}
+      >
+        {isComplete ? (
+          <VerificationEmail
+            status="success"
+            title="Your account has been created successfully!"
+            extra={
+              <Button type="primary" href="/login">
+                Back Home
+              </Button>
+            }
+          />
+        ) : (
+          <div>
+            <Title title="Sign Up" subTitle="Welcome! Please enter your details" />
+            <Form
+              name="basic"
+              labelCol={{ span: 24 }}
+              wrapperCol={{ span: 24 }}
+              initialValues={{ remember: true }}
+              onFinish={onFinish}
+              onFinishFailed={onFinishFailed}
             >
-              <Input placeholder="Enter Name" />
-            </Form.Item>
-            <Form.Item<FieldType>
-              label="Email"
-              name="email"
-              className="mb-3"
-              rules={[
-                { required: true, message: 'Please input your email!' },
-                {
-                  type: 'email',
-                  message: 'Please enter a valid email',
-                },
-              ]}
-            >
-              <Input placeholder="Enter Email" />
-            </Form.Item>
+              <Form.Item<FieldType>
+                label="Name"
+                name="name"
+                className="mb-3"
+                rules={[{ required: true, message: 'Please input your name!' }]}
+              >
+                <Input placeholder="Enter Name" />
+              </Form.Item>
+              <Form.Item<FieldType>
+                label="Email"
+                name="email"
+                className="mb-3"
+                rules={[
+                  { required: true, message: 'Please input your email!' },
+                  {
+                    type: 'email',
+                    message: 'Please enter a valid email',
+                  },
+                ]}
+              >
+                <Input placeholder="Enter Email" />
+              </Form.Item>
 
-            <Form.Item<FieldType>
-              label="Password"
-              name="password"
-              className="mb-3"
-              hasFeedback
-              rules={[
-                { required: true, message: 'Please input your password!' },
-                {
-                  min: 8,
-                  message: 'Password should be minimum of 8 characters',
-                },
-                {
-                  validator: (_, value) => {
-                    if (!value || !value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
-                      return Promise.reject(
-                        'Password should contain at least one number and one letter',
-                      );
-                    }
-                    return Promise.resolve();
+              <Form.Item<FieldType>
+                label="Password"
+                name="password"
+                className="mb-3"
+                hasFeedback
+                rules={[
+                  { required: true, message: 'Please input your password!' },
+                  {
+                    min: 8,
+                    message: 'Password should be minimum of 8 characters',
                   },
-                },
-              ]}
-            >
-              <Input.Password placeholder="Enter Password" />
-            </Form.Item>
-            <Form.Item
-              name="confirm"
-              label="Confirm Password"
-              dependencies={['password']}
-              hasFeedback
-              rules={[
-                {
-                  required: true,
-                  message: 'Please confirm your password!',
-                },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
+                  {
+                    validator: (_, value) => {
+                      if (!value || !value.match(/\d/) || !value.match(/[a-zA-Z]/)) {
+                        return Promise.reject(
+                          'Password should contain at least one number and one letter',
+                        );
+                      }
                       return Promise.resolve();
-                    }
-                    return Promise.reject(
-                      new Error('The new password that you entered do not match!'),
-                    );
+                    },
                   },
-                }),
-              ]}
-            >
-              <Input.Password placeholder="Confirm Password" />
-            </Form.Item>
-            <Button type="primary" htmlType="submit" block className="my-3" disabled={isPending}>
-              Submit
-            </Button>
-            <div className="text-center">
-              <Typography.Text type="secondary" className="cursor-default">
-                Already have an account?{' '}
-              </Typography.Text>
-              <a href="/login" title="Sign In">
-                Sign In
-              </a>
-            </div>
-          </Form>
-        </div>
-      )}
+                ]}
+              >
+                <Input.Password placeholder="Enter Password" />
+              </Form.Item>
+              <Form.Item
+                name="confirm"
+                label="Confirm Password"
+                dependencies={['password']}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: 'Please confirm your password!',
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue('password') === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error('The new password that you entered do not match!'),
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password placeholder="Confirm Password" />
+              </Form.Item>
+              <Button type="primary" htmlType="submit" block className="my-3" disabled={isPending}>
+                Submit
+              </Button>
+              <div className="text-center">
+                <Typography.Text type="secondary" className="cursor-default">
+                  Already have an account?{' '}
+                </Typography.Text>
+                <a href="/login" title="Sign In">
+                  Sign In
+                </a>
+              </div>
+            </Form>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

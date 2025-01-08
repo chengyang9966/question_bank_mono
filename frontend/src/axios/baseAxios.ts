@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const refreshTokenUrl = 'http://localhost:3077/api/v1/auth/refresh-tokens';
 const baseUrl = `${import.meta.env.VITE_BACKEND_URL}`;
+const refreshTokenUrl = `${baseUrl}/api/v1/auth/refresh-tokens`;
 
 const baseAxios = axios.create({
   baseURL: baseUrl,

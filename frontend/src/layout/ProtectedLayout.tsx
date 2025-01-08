@@ -51,24 +51,24 @@ const ProtectedLayout = () => {
   };
   const userMenu = [
     {
-      label: user?.name,
+      label: user?.name || 'User Profile',
       key: '1',
       onClick: () => {
         console.log('User Profile');
       },
       children: [
         {
-          label: 'Profile',
-          key: '1.1',
-          onClick: () => {
-            console.log('Settings');
-          },
-        },
-        {
           label: 'Quiz History',
           key: '1.2',
           onClick: () => {
             navigate('/user-quiz');
+          },
+        },
+        {
+          label: 'Settings',
+          key: '1.1',
+          onClick: () => {
+            navigate('/settings');
           },
         },
         {
@@ -86,7 +86,16 @@ const ProtectedLayout = () => {
   if (!user || !token) return <Navigate to="/login" />;
   return (
     <Layout>
-      <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <Header
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 1000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
         <div
           className="logo"
           style={{
@@ -99,13 +108,7 @@ const ProtectedLayout = () => {
             navigate('/');
           }}
         />
-        <Menu
-          theme="dark"
-          mode="horizontal"
-          defaultSelectedKeys={['2']}
-          items={[]}
-          style={{ flex: 1, minWidth: 0 }}
-        />
+
         <Menu theme="dark" mode="horizontal" items={userMenu} />
       </Header>
       <Content style={{ padding: '0 48px', paddingTop: '48px' }}>
@@ -114,6 +117,7 @@ const ProtectedLayout = () => {
             background: colorBgContainer,
             padding: 24,
             borderRadius: borderRadiusLG,
+            minHeight: 280,
           }}
         >
           <Outlet />

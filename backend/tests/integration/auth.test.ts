@@ -14,7 +14,7 @@ import { describe, beforeEach, test, expect, jest } from '@jest/globals';
 import { userOne, admin, insertUsers } from '../fixtures/user.fixture';
 import { Role, TokenType, User } from '@prisma/client';
 import prisma from '../../src/client';
-import { roleRights } from '../../src/config/roles';
+import { Features } from '../../src/config/roles';
 
 setupTestDB();
 
@@ -799,7 +799,7 @@ describe('Auth middleware', () => {
     });
     const next = jest.fn();
 
-    await auth('anyRight')(req, httpMocks.createResponse(), next);
+    await auth(Features.getUsers)(req, httpMocks.createResponse(), next);
 
     expect(next).toHaveBeenCalledWith(expect.any(ApiError));
     expect(next).toHaveBeenCalledWith(
@@ -821,7 +821,7 @@ describe('Auth middleware', () => {
     });
     const next = jest.fn();
 
-    await auth('anyRight')(req, httpMocks.createResponse(), next);
+    await auth(Features.getAllQuestions)(req, httpMocks.createResponse(), next);
 
     expect(next).toHaveBeenCalledWith();
   });
@@ -840,7 +840,7 @@ describe('Auth middleware', () => {
     });
     const next = jest.fn();
 
-    await auth(...(roleRights.get(Role.ADMIN) as string[]))(req, httpMocks.createResponse(), next);
+    await auth(Features.updateQuestionsAnswersByQuestionId)(req, httpMocks.createResponse(), next);
 
     expect(next).toHaveBeenCalledWith();
   });

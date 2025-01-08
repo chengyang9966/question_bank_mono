@@ -18,7 +18,8 @@ const Dashboard = () => {
   const [form] = Form.useForm<SessionFieldType>();
   const { user } = useUser();
   const navigate = useNavigate();
-  const defaultSubject = user?.Subjects[0];
+  console.log('user', user);
+  const defaultSubject = user?.Subjects ? user?.Subjects[0] : null;
   const { data, isLoading } = useQuery({
     queryKey: ['categories', defaultSubject?.id],
     queryFn: async () => {

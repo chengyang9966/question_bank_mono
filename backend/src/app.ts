@@ -14,7 +14,7 @@ import ApiError from './utils/ApiError';
 import router from './routes';
 
 const app = express();
-
+app.enable('trust proxy');
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -39,7 +39,7 @@ app.use(compression());
 app.use(
   cors({
     origin: '*', // Allow any origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true // Only use if cookies/credentials are needed
   })

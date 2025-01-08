@@ -21,7 +21,8 @@ export enum Features {
   updateSessionsByUserId = 'updateSessionsByUserId',
   getFeedbackByUserId = 'getFeedbackByUserId',
   createFeedbackByQuestionId = 'createFeedbackByQuestionId',
-  getFeedbacks = 'getFeedbacks'
+  getFeedbacks = 'getFeedbacks',
+  uploadQuestionsWithTaggingAndAnswer = 'uploadQuestionsWithTaggingAndAnswer'
 }
 
 const allRoles = {
@@ -33,7 +34,9 @@ const allRoles = {
     Features.updateSessionsByUserId,
     Features.getQuestionsTagging,
     Features.getFeedbackByUserId,
-    Features.createFeedbackByQuestionId
+    Features.createFeedbackByQuestionId,
+    Features.manageUsers,
+    Features.getUsers
   ],
   [Role.ADMIN]: [
     Features.getUsers,
@@ -56,7 +59,8 @@ const allRoles = {
     Features.updateSessionsByUserId,
     Features.getFeedbackByUserId,
     Features.createFeedbackByQuestionId,
-    Features.getFeedbacks
+    Features.getFeedbacks,
+    Features.uploadQuestionsWithTaggingAndAnswer
   ]
 };
 

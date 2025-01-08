@@ -96,86 +96,94 @@ const LoginPage: React.FC = () => {
   return (
     <div
       style={{
-        backgroundColor: colorBgContainer,
-        borderRadius: borderRadiusLG,
-        padding: '20px',
-        width: '400px',
         margin: 'auto',
-        marginTop: '100px',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100%',
       }}
     >
-      <Title title="Sign In" subTitle="Welcome back! Please enter your details" />
-      <Form
-        name="basic"
-        labelCol={{ span: 24 }}
-        wrapperCol={{ span: 24 }}
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        form={form}
-        onFinishFailed={onFinishFailed}
+      <div
+        style={{
+          maxWidth: '400px',
+          backgroundColor: colorBgContainer,
+          borderRadius: borderRadiusLG,
+          padding: '20px',
+        }}
       >
-        <Form.Item<FieldType>
-          label="Email"
-          name="email"
-          className="mb-3"
-          rules={[
-            { required: true, message: 'Please input your email!' },
-            {
-              type: 'email',
-              message: 'Please enter a valid email',
-            },
-          ]}
+        <Title title="Sign In" subTitle="Welcome back! Please enter your details" />
+        <Form
+          name="basic"
+          labelCol={{ span: 24 }}
+          wrapperCol={{ span: 24 }}
+          initialValues={{ remember: true }}
+          onFinish={onFinish}
+          form={form}
+          onFinishFailed={onFinishFailed}
         >
-          <Input placeholder="Enter Email" />
-        </Form.Item>
-
-        <Form.Item<FieldType>
-          label="Password"
-          name="password"
-          className="mb-3"
-          rules={[{ required: true, message: 'Please input your password!' }]}
-        >
-          <Input.Password placeholder="Enter Password" />
-        </Form.Item>
-        <Form.Item className="mb-3">
-          <Form.Item<FieldType> name="remember" valuePropName="checked" label={null} noStyle>
-            <Checkbox>Remember me</Checkbox>
+          <Form.Item<FieldType>
+            label="Email"
+            name="email"
+            className="mb-3"
+            rules={[
+              { required: true, message: 'Please input your email!' },
+              {
+                type: 'email',
+                message: 'Please enter a valid email',
+              },
+            ]}
+          >
+            <Input placeholder="Enter Email" />
           </Form.Item>
-          <a className="float-right" title="Forget Password" href="">
-            Forgot password
-          </a>
-        </Form.Item>
-        <Button type="primary" htmlType="submit" block disabled={isPending}>
-          Submit
-        </Button>
-        <div className="text-center">
-          <Row justify={'center'} className="my-3 cursor-default">
-            <Col span={11}>
-              <div
-                className=" bg-gray-300 mt-[6%] mr-1"
-                style={{
-                  height: '2px',
-                }}
-              ></div>
-            </Col>
-            <Col span={2}>OR</Col>
-            <Col span={11}>
-              <div
-                className=" bg-gray-300 mt-[6%] ml-1"
-                style={{
-                  height: '2px',
-                }}
-              ></div>
-            </Col>
-          </Row>
-          <Typography.Text type="secondary" className="cursor-default">
-            Dont have an account?{' '}
-          </Typography.Text>
-          <a href="/register" title="Sign Up">
-            Sign Up
-          </a>
-        </div>
-      </Form>
+
+          <Form.Item<FieldType>
+            label="Password"
+            name="password"
+            className="mb-3"
+            rules={[{ required: true, message: 'Please input your password!' }]}
+          >
+            <Input.Password placeholder="Enter Password" />
+          </Form.Item>
+          <Form.Item className="mb-3">
+            <Form.Item<FieldType> name="remember" valuePropName="checked" label={null} noStyle>
+              <Checkbox>Remember me</Checkbox>
+            </Form.Item>
+            <a className="float-right" title="Forget Password" href="">
+              Forgot password
+            </a>
+          </Form.Item>
+          <Button type="primary" htmlType="submit" block disabled={isPending}>
+            Submit
+          </Button>
+          <div className="text-center">
+            <Row justify={'center'} className="my-3 cursor-default">
+              <Col span={11}>
+                <div
+                  className=" bg-gray-300 mt-[6%] mr-1"
+                  style={{
+                    height: '2px',
+                  }}
+                ></div>
+              </Col>
+              <Col span={2}>OR</Col>
+              <Col span={11}>
+                <div
+                  className=" bg-gray-300 mt-[6%] ml-1"
+                  style={{
+                    height: '2px',
+                  }}
+                ></div>
+              </Col>
+            </Row>
+            <Typography.Text type="secondary" className="cursor-default">
+              Dont have an account?{' '}
+            </Typography.Text>
+            <a href="/register" title="Sign Up">
+              Sign Up
+            </a>
+          </div>
+        </Form>
+      </div>
     </div>
   );
 };

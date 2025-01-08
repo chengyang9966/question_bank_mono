@@ -74,6 +74,13 @@ const getAllQuestions = catchAsync(async (req, res) => {
   });
 });
 
+const uploadQuestionsWithTaggingAndAnswer = catchAsync(async (req, res) => {
+  const files = req.files as Express.Multer.File[];
+  const data = await adminV2Service.createQuestionsAnswerAndTagging(files);
+
+  res.status(httpStatus.CREATED).send({ message: 'Questions created successfully', data: data[0] });
+});
+
 export default {
   getAllQuestionsTagging,
   registerAdmin,
@@ -81,5 +88,6 @@ export default {
   createQuestionsReference,
   getAllQuestionsReference,
   createQuestions,
-  getAllQuestions
+  getAllQuestions,
+  uploadQuestionsWithTaggingAndAnswer
 };

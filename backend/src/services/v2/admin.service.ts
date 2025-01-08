@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Pagination } from '../../types/pagination';
 import paginationHelper from '../../helper/pagination.helper';
 import { buildSelect } from '../../utils/select';
+import xlsx from 'xlsx';
 
 const medicalSubjectId = 'd5341128-27b0-467c-8a7a-8031bd005f16';
 
@@ -343,11 +344,185 @@ const getAllQuestions = async <Key extends keyof QuestionsWithAnswers>(
   };
 };
 
+const createQuestionsAnswerAndTagging = async (files: Express.Multer.File[]) => {
+  if (!files.length) {
+    throw new Error('No file uploaded');
+  }
+
+  const data = files.map((file) => {
+    return {
+      file: file.filename,
+      buffer: file?.buffer
+    };
+  });
+  console.log(files);
+  const response = data.map(async (d) => {
+    const workbook = xlsx.read(d.buffer, { type: 'buffer' });
+    const tags: {
+      id: string;
+      title: string;
+      description: string;
+    }[] = [];
+    const questions: {
+      id: string;
+      question: string;
+      difficulty: number;
+      isPublic: boolean;
+      isMultipleChoice: boolean;
+      taggingQuestionsId: string;
+      description: string;
+    }[] = [];
+    const answers: {
+      id: string;
+      answer: string;
+      isCorrect: boolean;
+      questionId: string;
+      explaination: string;
+    }[] = [];
+    workbook.SheetNames.forEach(async (sheetName) => {
+      const sheet = workbook.Sheets[sheetName];
+
+      if (sheetName === 'Tag') {
+        const sheetData = xlsx.utils.sheet_to_json<{ tag: string; description: string }>(sheet);
+        console.log(sheetData);
+        tags.push(
+          ...sheetData.map((tag) => ({
+            id: uuidv4(),
+            title: tag.tag.trim(),
+            description: tag.description.trim()
+          }))
+        );
+      }
+      if (sheetName === 'Questions') {
+        const sheetData = xlsx.utils.sheet_to_json<{
+          question: string;
+          difficulty: number;
+          isPublic: boolean;
+          isMultipleChoice: boolean;
+          tagging: string;
+          description: string;
+        }>(sheet);
+        console.log(sheetData);
+        questions.push(
+          ...sheetData.map((question) => {
+            const taggingQuestions = tags.find((tag) => tag.title === question.tagging.trim());
+            return {
+              id: uuidv4(),
+              question: question.question.trim(),
+              description: question.description.trim(),
+              difficulty: question.difficulty,
+              isPublic: question.isPublic,
+              isMultipleChoice: question.isMultipleChoice,
+              taggingQuestionsId: taggingQuestions?.id ?? ''
+            };
+          })
+        );
+      }
+      if (sheetName === 'Answers') {
+        const sheetData = xlsx.utils.sheet_to_json<{
+          answer: string | boolean;
+          isCorrect: boolean;
+          question: string;
+          explaination: string;
+        }>(sheet);
+        console.log(sheetData);
+        answers.push(
+          ...sheetData.map((answer) => {
+            const question = questions.find(
+              (question) => question.question === answer.question.trim()
+            );
+            return {
+              id: uuidv4(),
+              answer:
+                typeof answer.answer === 'boolean'
+                  ? String(answer.answer).toLowerCase().charAt(0).toUpperCase() +
+                    String(answer.answer).toLowerCase().slice(1)
+                  : answer.answer.trim(),
+              isCorrect: answer.isCorrect,
+              explaination: answer.explaination,
+              questionId: question?.id ?? ''
+            };
+          })
+        );
+      }
+    });
+
+    return await prisma.$transaction(async (tx) => {
+      const latesetSequenceTag = await prisma.questionTag.findFirst({
+        orderBy: {
+          sequence: 'desc'
+        }
+      });
+      await tx.questionTag.createMany({
+        data: tags.map((tag, index) => ({
+          id: tag.id,
+          tag: tag.title,
+          description: tag.description,
+          sequence: (latesetSequenceTag?.sequence || 0) + index + 1
+        }))
+      });
+      await tx.question.createMany({
+        data: questions.map((question) => ({
+          id: question.id,
+          text: question.question,
+          difficulty: question.difficulty,
+          isPublic: question.isPublic,
+          isMultipleChoice: question.isMultipleChoice
+        }))
+      });
+      await tx.answer.createMany({
+        data: answers.map((answer) => ({
+          id: answer.id,
+          text: answer.answer,
+          explaination: answer.explaination,
+          isCorrect: answer.isCorrect,
+          questionId: answer.questionId
+        }))
+      });
+      await Promise.all(
+        questions.map(async (question) => {
+          console.log('question', question);
+          await tx.questionTag.update({
+            where: {
+              id: question.taggingQuestionsId
+            },
+            data: {
+              Questions: {
+                connect: {
+                  id: question.id
+                }
+              }
+            }
+          });
+        })
+      );
+
+      return await tx.question.findMany({
+        where: {
+          id: {
+            in: questions.map((q) => q.id)
+          }
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        include: {
+          Answer: true,
+          TaggingQuestions: true
+        }
+      });
+    });
+  });
+
+  return await Promise.all(response);
+};
+
 export default {
   getAllQuestionsTagging,
   createQuestionTagging,
   createReference,
   getAllReferences,
   createQuestions,
-  getAllQuestions
+  getAllQuestions,
+  createQuestionsAnswerAndTagging
 };

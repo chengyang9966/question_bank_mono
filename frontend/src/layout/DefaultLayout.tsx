@@ -4,8 +4,8 @@ import { Outlet } from 'react-router';
 const DefaultLayout = () => {
   const { Content } = Layout;
   return (
-    <Layout>
-      <Content className="h-dvh p-10">
+    <Layout style={{ height: '100vh' }}>
+      <Content>
         <Outlet />
       </Content>
     </Layout>

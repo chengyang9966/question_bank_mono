@@ -10,6 +10,7 @@ import SEO from './components/SEO';
 import RegisterPage from './pages/Register';
 import VerifyEmailPage from './pages/VerifyEmail';
 import QuizHistory from './pages/QuizHistory';
+import SettingsPage from './pages/Settings';
 
 const queryClient = new QueryClient();
 function App() {
@@ -27,7 +28,7 @@ function App() {
           <Route element={<ProtectedLayout />}>
             <Route path="/session/:sessionId" element={<QuestionsPage />} />
             <Route path="user-quiz" element={<QuizHistory />} />
-
+            <Route path="/settings" element={<SettingsPage />} />
             <Route index element={<Dashboard />} />
           </Route>
           <Route element={<DefaultLayout />}>

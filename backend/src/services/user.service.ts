@@ -64,16 +64,7 @@ const queryUsers = async <Key extends keyof User>(
     sortBy?: string;
     sortType?: 'asc' | 'desc';
   },
-  keys: Key[] = [
-    'id',
-    'email',
-    'name',
-    'password',
-    'role',
-    'isEmailVerified',
-    'createdAt',
-    'updatedAt'
-  ] as Key[]
+  keys: Key[] = ['id', 'email', 'name', 'password', 'role', 'isEmailVerified'] as Key[]
 ): Promise<Pick<User, Key>[]> => {
   const page = options.page ?? 1;
   const limit = options.limit ?? 10;
@@ -149,7 +140,17 @@ const getUserByEmail = async <Key extends keyof UserWithSubject>(
 const updateUserById = async <Key extends keyof User>(
   userId: string,
   updateBody: Prisma.UserUpdateInput,
-  keys: Key[] = ['id', 'email', 'name', 'role'] as Key[]
+  keys: Key[] = [
+    'id',
+    'email',
+    'name',
+    'role',
+    'isEmailVerified',
+    'createdAt',
+    'updatedAt',
+    'isActive',
+    'Subjects'
+  ] as Key[]
 ): Promise<Pick<User, Key> | null> => {
   const user = await getUserById(userId, ['id', 'email', 'name']);
   if (!user) {
@@ -157,6 +158,9 @@ const updateUserById = async <Key extends keyof User>(
   }
   if (updateBody.email && (await getUserByEmail(updateBody.email as string))) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
+  }
+  if (updateBody.password) {
+    updateBody.password = await encryptPassword(updateBody.password as string);
   }
   const updatedUser = await prisma.user.update({
     where: { id: user.id },
