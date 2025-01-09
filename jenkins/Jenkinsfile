@@ -9,8 +9,9 @@ pipeline {
         }
         stage('Test') {
             steps {
-                sh 'pwd'
-                sh './jenkins/scripts/test.sh'
+             sh 'pwd'
+             sh 'chmod +x ./jenkins/scripts/test.sh'  // Ensure execute permissions
+             sh './jenkins/scripts/test.sh'
             }
         }
         // stage('Deliver') {
