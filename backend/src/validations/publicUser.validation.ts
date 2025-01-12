@@ -2,7 +2,7 @@ import Joi from 'joi';
 
 const createPublicUser = {
   body: Joi.object().keys({
-    email: Joi.string().trim().required().email(),
+    email: Joi.string().trim().required().email().lowercase(),
     name: Joi.string().trim().required()
   })
 };

@@ -3,7 +3,7 @@ import { password } from './custom.validation';
 
 const register = {
   body: Joi.object().keys({
-    email: Joi.string().trim().required().email(),
+    email: Joi.string().trim().required().email().lowercase(),
     password: Joi.string().trim().required().custom(password),
     name: Joi.string().trim().optional()
   })
@@ -11,7 +11,7 @@ const register = {
 
 const login = {
   body: Joi.object().keys({
-    email: Joi.string().trim().required(),
+    email: Joi.string().trim().required().email().lowercase(),
     password: Joi.string().trim().required()
   })
 };
@@ -30,7 +30,7 @@ const refreshTokens = {
 
 const forgotPassword = {
   body: Joi.object().keys({
-    email: Joi.string().trim().email().required()
+    email: Joi.string().trim().email().lowercase().required()
   })
 };
 
@@ -51,7 +51,7 @@ const verifyEmail = {
 
 const sendVerificationEmail = {
   body: Joi.object().keys({
-    email: Joi.string().trim().required()
+    email: Joi.string().trim().required().email().lowercase()
   })
 };
 
